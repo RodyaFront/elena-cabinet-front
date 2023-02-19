@@ -13,6 +13,7 @@
           hide-details
           outlined
           label="Поиск в таблице по имени"
+          clearable
           append-icon="mdi-magnify"
         >
         </v-text-field>
@@ -36,6 +37,16 @@
             {{ item.debt / 100 }} грн
             <v-btn icon large @click="handleChangeDebt(item)">
               <v-icon>mdi-pencil-outline</v-icon>
+            </v-btn>
+          </template>
+          <template #[`item.history`]="{ item }">
+            <v-btn
+              icon
+              large
+              @click="handleShowDebtHistory(item)"
+              :loading="loadings.debtHistory.includes(item.id)"
+            >
+              <v-icon>mdi-history</v-icon>
             </v-btn>
           </template>
         </v-data-table>
@@ -129,6 +140,24 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="debtHisotryDialogModel">
+      <v-card rounded="xl">
+        <v-card-title class="d-flex pb-0"> История долга </v-card-title>
+        <v-card-text>
+          <v-data-table
+            :headers="debtHistoryTableHeaders"
+            :items="debtHistoryItems"
+          >
+            <template #[`item.createdAt`]="{ value }">
+              {{ $moment(value).calendar() }}
+            </template>
+            <template #[`item.amount`]="{ item }">
+              {{ item.amount / 100 }} грн
+            </template>
+          </v-data-table>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -149,18 +178,13 @@ export default {
         value: 'debt',
       },
       {
-        text: 'Добавлен',
-        value: 'createdAt',
-      },
-      {
-        text: 'Обновлен',
-        value: 'updatedAt',
+        text: 'История',
+        value: 'history',
       },
     ],
     rows: [],
     debtForm: {
       debtor: null,
-      debtorId: null,
       whole: null,
       cents: null,
       plus: {
@@ -171,20 +195,62 @@ export default {
     },
     loadings: {
       table: false,
+      debtHistory: [],
       savingNewDebt: false,
       savingPlusDebt: false,
     },
     debtChangeDialogModel: false,
+    debtHisotryDialogModel: false,
+    debtHistoryItems: [],
+    debtHistoryTableHeaders: [
+      {
+        text: 'Сумма',
+        value: 'amount',
+      },
+      {
+        text: 'Описание',
+        value: 'description',
+      },
+      {
+        text: 'Добавлен',
+        value: 'createdAt',
+        align: 'end',
+      },
+    ],
   }),
   created() {
     this.fetchDebtors()
   },
   computed: {},
   methods: {
+    async handleShowDebtHistory({ id }) {
+      try {
+        const url = this.$store.getters['serverUrl'] + '/debtor/history/' + id
+
+        this.loadings.debtHistory.push(id)
+
+        const resp = await this.$axios.get(url)
+
+        this.loadings.debtHistory = this.loadings.debtHistory.filter(
+          (v) => v !== id
+        )
+
+        if (resp && resp.data) {
+          this.debtHisotryDialogModel = true
+          this.debtHistoryItems = resp.data.history
+        }
+      } catch {
+        this.loadings.debtHistory = this.loadings.debtHistory.filter(
+          (v) => v !== id
+        )
+      }
+    },
     async handleSaveNewDebt() {
       try {
         const url =
-          this.$store.getters['serverUrl'] + '/debtor/' + this.debtForm.debtorId
+          this.$store.getters['serverUrl'] +
+          '/debtor/' +
+          this.debtForm.debtorData.id
 
         this.loadings.savingNewDebt = true
 
@@ -216,7 +282,9 @@ export default {
     async handlePlusNewDebt() {
       try {
         const url =
-          this.$store.getters['serverUrl'] + '/debtor/' + this.debtForm.debtorId
+          this.$store.getters['serverUrl'] +
+          '/debtor/' +
+          this.debtForm.debtorData.id
 
         this.loadings.savingPlusDebt = true
 
@@ -227,6 +295,7 @@ export default {
 
         const payload = {
           debt,
+          difference: debt - this.debtForm.debtorData.debt,
         }
 
         const resp = await this.$axios.put(url, payload)
@@ -248,7 +317,6 @@ export default {
       this.debtForm.whole = Math.floor(total / 100)
       this.debtForm.cents = total % 100
       this.debtForm.debtor = item.name
-      this.debtForm.debtorId = item.id
       this.debtForm.debtorData = item
 
       this.debtChangeDialogModel = true
