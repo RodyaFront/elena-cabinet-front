@@ -6,8 +6,8 @@ export default {
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    titleTemplate: '%s | Elena Cabinet',
-    title: 'Cabinet',
+    titleTemplate: '%s | Кабинет должников',
+    title: 'Кабинет',
     htmlAttrs: {
       lang: 'en',
     },
@@ -41,7 +41,13 @@ export default {
   modules: [
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
+    '@nuxtjs/moment',
   ],
+
+  moment: {
+    locales: ['ru'],
+    defaultLocale: 'ru',
+  },
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {

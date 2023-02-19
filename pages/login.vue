@@ -11,7 +11,9 @@
           placeholder="Введите ваше имя"
           label="Имя"
           outlined
+          :error="error"
           hide-details
+          @change="error = null"
         ></v-text-field>
       </v-col>
       <v-col cols="12">
@@ -22,13 +24,16 @@
           @click:append="showPassword = !showPassword"
           label="Пароль"
           outlined
+          :error="error"
           hide-details
+          @change="error = null"
         ></v-text-field>
       </v-col>
       <v-col cols="12">
         <v-btn block color="primary" x-large @click="login"
           >Войти в базу данных</v-btn
         >
+        <div v-if="error" class="mt-2 error--text">{{ error }}</div>
       </v-col>
     </v-row>
   </v-container>
@@ -36,10 +41,12 @@
 
 <script>
 export default {
+  layout: 'auth',
   data: () => ({
     name: null,
     password: null,
     showPassword: false,
+    error: null,
   }),
   methods: {
     login() {
@@ -51,8 +58,9 @@ export default {
           'token',
           'auth-token-o4j1h24p98yuandjas89eu124'
         )
-        this.$router.push('/')
+        return this.$router.push('/')
       }
+      this.error = 'Не удалось войти.'
     },
   },
 }
