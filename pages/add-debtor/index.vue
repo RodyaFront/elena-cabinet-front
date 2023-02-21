@@ -99,6 +99,7 @@
 
 <script>
 import SuccessSvg from '@/components/icons/SuccessSvg.vue'
+import fetcher from '@/services/fetcher'
 
 export default {
   components: { SuccessSvg },
@@ -150,9 +151,9 @@ export default {
 
         this.loadings.saving = true
 
-        const resp = await this.$axios.post(url, payload)
+        const resp = await fetcher.post(url, payload, this.$store)
 
-        if (resp && resp.data && resp.status) {
+        if (resp && resp.status) {
           this.successDialogModel = true
         }
 

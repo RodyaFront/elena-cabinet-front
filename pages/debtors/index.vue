@@ -142,7 +142,13 @@
     </v-dialog>
     <v-dialog v-model="debtHisotryDialogModel">
       <v-card rounded="xl">
-        <v-card-title class="d-flex pb-0"> История долга </v-card-title>
+        <v-card-title class="d-flex pb-0">
+          <v-spacer />
+          <v-chip color="error" outlined @click="debtHisotryDialogModel = false"
+            >Закрыть <v-icon right>mdi-close</v-icon></v-chip
+          >
+        </v-card-title>
+        <v-card-title class="d-flex pb-0 pt-0"> История долга </v-card-title>
         <v-card-text>
           <v-data-table
             :headers="debtHistoryTableHeaders"
@@ -163,6 +169,7 @@
 
 <script>
 import { DEFAULT_FOOTER_PROPS } from '@/utils/defaultData'
+import fetcher from '@/services/fetcher'
 
 export default {
   data: () => ({
@@ -225,19 +232,19 @@ export default {
   methods: {
     async handleShowDebtHistory({ id }) {
       try {
-        const url = this.$store.getters['serverUrl'] + '/debtor/history/' + id
+        const url = '/debtor/history/' + id
 
         this.loadings.debtHistory.push(id)
 
-        const resp = await this.$axios.get(url)
+        const resp = await fetcher.get(url, this.$store)
 
         this.loadings.debtHistory = this.loadings.debtHistory.filter(
           (v) => v !== id
         )
 
-        if (resp && resp.data) {
+        if (resp && resp.history) {
           this.debtHisotryDialogModel = true
-          this.debtHistoryItems = resp.data.history
+          this.debtHistoryItems = resp.history
         }
       } catch {
         this.loadings.debtHistory = this.loadings.debtHistory.filter(
@@ -247,10 +254,7 @@ export default {
     },
     async handleSaveNewDebt() {
       try {
-        const url =
-          this.$store.getters['serverUrl'] +
-          '/debtor/' +
-          this.debtForm.debtorData.id
+        const url = '/debtor/' + this.debtForm.debtorData.id
 
         this.loadings.savingNewDebt = true
 
@@ -261,11 +265,11 @@ export default {
           debt,
         }
 
-        const resp = await this.$axios.put(url, payload)
+        const resp = await fetcher.put(url, payload, this.$store)
 
         this.loadings.savingNewDebt = false
 
-        if (resp && resp.data && resp.status) {
+        if (resp && resp.status) {
           this.debtChangeDialogModel = false
           this.fetchDebtors()
         }
@@ -281,10 +285,7 @@ export default {
     },
     async handlePlusNewDebt() {
       try {
-        const url =
-          this.$store.getters['serverUrl'] +
-          '/debtor/' +
-          this.debtForm.debtorData.id
+        const url = '/debtor/' + this.debtForm.debtorData.id
 
         this.loadings.savingPlusDebt = true
 
@@ -298,11 +299,11 @@ export default {
           difference: debt - this.debtForm.debtorData.debt,
         }
 
-        const resp = await this.$axios.put(url, payload)
+        const resp = await fetcher.put(url, payload, this.$store)
 
         this.loadings.savingPlusDebt = false
 
-        if (resp && resp.data && resp.status) {
+        if (resp && resp.status) {
           this.debtChangeDialogModel = false
           this.resetDebtorsForm()
           this.fetchDebtors()
@@ -323,17 +324,17 @@ export default {
     },
     async fetchDebtors() {
       try {
-        const url = this.$store.getters['serverUrl'] + '/debtor'
+        const url = '/debtor'
 
         this.loadings.table = true
 
         this.rows = []
 
-        const resp = await this.$axios.get(url)
+        const resp = await fetcher.get(url, this.$store)
 
         this.loadings.table = false
 
-        if (resp && resp.data) this.rows = resp.data.debtors
+        if (resp && resp.debtors) this.rows = resp.debtors
       } catch {
         this.loadings.table = false
       }

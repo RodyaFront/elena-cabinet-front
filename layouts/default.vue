@@ -2,7 +2,7 @@
   <v-app>
     <v-app-bar dark hide-on-scroll>
       <v-row dense class="d-flex align-center">
-        <v-col>Кабинет Должников</v-col>
+        <v-col class="nowrap">Кабинет Должников</v-col>
         <v-spacer />
         <v-col class="d-flex justify-end">
           <template v-if="$route.fullPath === '/'">
@@ -27,13 +27,37 @@
 </template>
 
 <script>
+import Toast from 'vue-toastification'
+import 'vue-toastification/dist/index.css'
+
 export default {
   name: 'defaultLayout',
   middleware: 'auth',
+  components: {
+    Toast,
+  },
   data: () => ({}),
+  computed: {
+    getError() {
+      return this.$store.getters.error
+    },
+  },
+  watch: {
+    getError(e) {
+      if (!e) return
+
+      if (e.response.status === 403) {
+        this.$toast.error(
+          'Вам нужно по новой зайти в приложение и ввести Имя и Пароль.'
+        )
+        return this.$router.push('/login')
+      }
+      this.$toast.error(e.message)
+    },
+  },
   methods: {
     logout() {
-      window.localStorage.clear()
+      this.$store.dispatch('user/logout')
       this.$router.push('/login')
     },
   },
@@ -51,7 +75,7 @@ $v-app-bar-color: #fff;
   height: $v-app-bar-height;
   background-color: $v-app-bar-background-color;
   color: $v-app-bar-color;
-  max-height: 56px !important;
+  max-height: $v-app-bar-height !important;
   /* Add more custom styles here */
 
   /* Target elements inside app-bar */

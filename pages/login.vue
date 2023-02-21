@@ -11,7 +11,7 @@
           placeholder="Введите ваше имя"
           label="Имя"
           outlined
-          :error="error"
+          :error="!!error"
           hide-details
           @change="error = null"
         ></v-text-field>
@@ -24,13 +24,13 @@
           @click:append="showPassword = !showPassword"
           label="Пароль"
           outlined
-          :error="error"
+          :error="!!error"
           hide-details
           @change="error = null"
         ></v-text-field>
       </v-col>
       <v-col cols="12">
-        <v-btn block color="primary" x-large @click="login"
+        <v-btn block color="primary" x-large @click="login" :loading="loading"
           >Войти в базу данных</v-btn
         >
         <div v-if="error" class="mt-2 error--text">{{ error }}</div>
@@ -40,27 +40,43 @@
 </template>
 
 <script>
+import fetcher from '@/services/fetcher'
+
 export default {
   layout: 'auth',
   data: () => ({
-    name: null,
-    password: null,
+    name: 'elena hordiienko',
+    password: '8098',
     showPassword: false,
+    loading: false,
     error: null,
   }),
   methods: {
-    login() {
-      if (
-        String(this.name).toLowerCase() === 'elena serhiivna' &&
-        String(this.password) === '8098'
-      ) {
-        window.localStorage.setItem(
-          'token',
-          'auth-token-o4j1h24p98yuandjas89eu124'
-        )
-        return this.$router.push('/')
+    async login() {
+      try {
+        const url = '/auth/login'
+
+        const payload = {
+          name: this.name,
+          password: this.password,
+        }
+
+        this.loading = true
+
+        const resp = await fetcher.post(url, payload, this.$store)
+
+        if (resp && resp.token) {
+          if (await this.$store.dispatch('user/setTokenToCookie', resp.token)) {
+            this.$router.push('/')
+          }
+        }
+
+        this.loading = false
+      } catch (e) {
+        console.error(e)
+        this.error = 'Имя или пароль введены не верно.'
+        this.loading = false
       }
-      this.error = 'Не удалось войти.'
     },
   },
 }
