@@ -54,7 +54,7 @@
     </v-row>
     <v-dialog v-model="debtChangeDialogModel" persistent>
       <v-card rounded="xl">
-        <v-card-title class="d-flex pb-0">
+        <v-card-title class="d-flex pb-2">
           <v-spacer />
           <v-chip color="error" outlined @click="debtChangeDialogModel = false"
             >Закрыть <v-icon right>mdi-close</v-icon></v-chip
@@ -142,7 +142,10 @@
     </v-dialog>
     <v-dialog v-model="debtHisotryDialogModel">
       <v-card rounded="xl">
-        <v-card-title class="d-flex pb-0">
+        <v-card-title
+          class="d-flex pb-2 sticky-top"
+          style="background-color: #fff; z-index: 5"
+        >
           <v-spacer />
           <v-chip color="error" outlined @click="debtHisotryDialogModel = false"
             >Закрыть <v-icon right>mdi-close</v-icon></v-chip

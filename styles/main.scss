@@ -5,3 +5,10 @@
 .nowrap {
   white-space: nowrap;
 }
+
+.sticky {
+  &-top {
+    position: sticky;
+    top: 0;
+  }
+}

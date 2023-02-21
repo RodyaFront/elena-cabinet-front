@@ -1,5 +1,5 @@
 <template>
-  <v-container style="height: 100vh" class="d-flex align-center">
+  <v-container style="height: 70vh" class="d-flex align-center">
     <v-row dense>
       <v-col cols="12">
         <h2>Добро пожаловать в кабинет, Елена Сергеевна</h2>
@@ -17,7 +17,7 @@
         </v-btn>
       </v-col>
       <v-col cols="12">
-        <v-btn block outlined x-large @click="$router.push('/add-debtor')">
+        <v-btn block text x-large @click="$router.push('/add-debtor')">
           Добавить нового должника
           <v-icon right>mdi-pencil-outline</v-icon>
         </v-btn>

@@ -1,48 +1,53 @@
 <template>
-  <v-container style="height: calc(100vh - 56px)" class="d-flex align-center">
-    <v-row>
-      <v-col cols="12">
-        <h2>Добавим нового должника</h2>
-        <p class="ma-0">
-          Заполните поля и нажмите "Добавить", что бы продолжить.
-        </p>
-      </v-col>
-      <v-col cols="=12">
-        <p>1. Введите имя человека.</p>
-        <v-text-field
-          v-model="name"
-          outlined
-          label="Имя"
-          hide-details="auto"
-          :error-messages="nameError"
-          :error="!!nameError"
-          placeholder="Введите имя"
-        ></v-text-field>
-      </v-col>
-      <v-col cols="12">
-        <p>2. Введите долг человека. Можно оставить пустым.</p>
-        <v-row dense>
-          <v-col cols="8">
-            <v-text-field
-              v-model="debt.whole"
-              outlined
-              label="Гривен"
-              type="number"
-              hide-details
-            ></v-text-field>
-          </v-col>
-          <v-col cols="4">
-            <v-text-field
-              v-model="debt.cents"
-              outlined
-              type="number"
-              label="Копеек"
-              hide-details
-            ></v-text-field>
-          </v-col>
-        </v-row>
-      </v-col>
-      <v-col cols="12">
+  <v-container class="d-flex align-end">
+    <v-row style="min-height: calc(100vh - 56px)">
+      <div>
+        <v-col cols="12">
+          <h2>Добавим нового должника</h2>
+          <p class="ma-0">
+            Заполните поля и нажмите "Добавить", что бы продолжить.
+          </p>
+        </v-col>
+      </div>
+      <div>
+        <v-col cols="=12">
+          <p>1. Введите имя человека.</p>
+          <v-text-field
+            v-model="name"
+            outlined
+            label="Имя"
+            hide-details="auto"
+            :error-messages="nameError"
+            :error="!!nameError"
+            placeholder="Введите имя"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="12">
+          <p>2. Введите долг человека. Можно оставить пустым.</p>
+          <v-row dense>
+            <v-col cols="8">
+              <v-text-field
+                v-model="debt.whole"
+                outlined
+                label="Гривен"
+                type="number"
+                hide-details
+              ></v-text-field>
+            </v-col>
+            <v-col cols="4">
+              <v-text-field
+                v-model="debt.cents"
+                outlined
+                type="number"
+                label="Копеек"
+                hide-details
+              ></v-text-field>
+            </v-col>
+          </v-row>
+        </v-col>
+      </div>
+      <v-spacer />
+      <v-col cols="12" class="d-flex align-end">
         <v-btn
           x-large
           block
